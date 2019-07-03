@@ -67,11 +67,24 @@ class App extends Component {
       // Calling setState will trigger a call to render() in App and all child components.
       this.setState({ messages: messages })
     }, 6000);
+    // connect to Chatty App Server
+    const chattyServerConnection = new WebSocket('ws://localhost:3001');
+    this.setState({ chattyServer: chattyServerConnection })
+    chattyServerConnection.onopen = (event) => {
+      console.log('connected to server');
+    }
   }
   getNextID() {
     return (this.state.messages.length + 1)
   }
   postNewMessage(message) {
+    //send message to server
+    if (message.username) {
+      this.state.chattyServer.send(message.username + ' said ' + message.content);
+    } else {
+      this.state.chattyServer.send(message.content);
+    }
+    // update state message
     const addMessage = this.state.messages.concat(message);
     this.setState({ messages: addMessage })
   }
