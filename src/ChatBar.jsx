@@ -24,7 +24,7 @@ class ChatBar extends Component {
             return;
         }
         const newMessage = {
-            id: this.props.nextID,
+            id: this.props.nextID(),
             type: "incomingNotification",
             content: `${this.state.userName} changed their name to ${newName}`,
         }
