@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
@@ -51,33 +51,37 @@ class App extends Component {
           content: "Anonymous2 changed their name to NotFunny",
         },
       ]
-      
+
     }
     this.postNewMessage = this.postNewMessage.bind(this);
+    this.getNextID = this.getNextID.bind(this);
   }
   componentDidMount() {
     console.log("componentDidMount <App />");
     setTimeout(() => {
       console.log("Simulating incoming message");
       // Add a new message to the list of messages in the data store
-      const newMessage = {id: 13, username: "Nima", content: "I'm watching you", type: "incomingMessage"};
+      const newMessage = { id: 999999913, username: "Nima", content: "I'm in love with Kanye 😍", type: "incomingMessage" };
       const messages = this.state.messages.concat(newMessage)
       // Update the state of the app component.
       // Calling setState will trigger a call to render() in App and all child components.
-      this.setState({messages: messages})
+      this.setState({ messages: messages })
     }, 6000);
+  }
+  getNextID() {
+    return (this.state.messages.length + 1)
   }
   postNewMessage(message) {
     const addMessage = this.state.messages.concat(message);
-    this.setState({messages: addMessage})
+    this.setState({ messages: addMessage })
   }
-  
+
   render() {
     return (
       <div>
-        <NavBar/>
+        <NavBar />
         <MessageList posts={this.state.messages} />
-        <ChatBar username={this.state.currentUser} postMessage={this.postNewMessage}/>
+        <ChatBar username={this.state.currentUser} postMessage={this.postNewMessage} nextID={this.getNextID} />
       </div>
     );
   }

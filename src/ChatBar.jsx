@@ -14,11 +14,19 @@ class ChatBar extends Component {
         this.newUsername = this.newUsername.bind(this);
     }
     newUsername(event) {
-
+        let newName = event.target.value;
+        if (newName === '') {
+            event.target.value = 'Anonymous';
+            this.setState({userName: 'Anonymous'});
+            newName = 'Anonymous';
+        }
+        if (this.state.userName === newName) {
+            return;
+        }
         const newMessage = {
-            id: Math.floor((Math.random() * 999999) + 1),
+            id: this.props.nextID,
             type: "incomingNotification",
-            content: `${this.state.userName} changed their name to ${this.state.newUserName}`,
+            content: `${this.state.userName} changed their name to ${newName}`,
         }
         this.setState({
             userName: event.target.value
@@ -37,8 +45,11 @@ class ChatBar extends Component {
     }
     checkKeypress(event) {
         if (event.key === 'Enter') {
+            if (this.state.message.length < 1) {
+                return;
+            }
             const newMessage = {
-                id: Math.floor((Math.random() * 999999) + 1),
+                id: this.props.nextID(),
                 type: "incomingMessage",
                 content: this.state.message,
                 username: this.state.userName
