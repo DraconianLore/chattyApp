@@ -3,13 +3,14 @@ import React, { Component } from 'react';
 import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 import ChatBar from './ChatBar.jsx';
-let chattyServer;
 
 const animals = require('./animals.json');
 const colours = require('./colours.json');
 function randomizer(randomType) {
   return (randomType[Math.floor(Math.random() * randomType.length)]);
 }
+let chattyServer;
+
 
 class App extends Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class App extends Component {
     this.changeColour = this.changeColour.bind(this);
   }
   connectToServer() {
-    chattyServer = new WebSocket('ws://192.168.88.215:3001/');
+    chattyServer = new WebSocket('ws://192.168.88.104:3001/');
     chattyServer.onopen = (event) => {
       console.log('connected to server');
     }
@@ -33,25 +34,23 @@ class App extends Component {
       const msg = JSON.parse(event.data);
       switch (msg.type) {
         case "incomingMessage":
-          this.updateMessages(msg);
-          break;
+          if (msg.username !== this.state.currentUser){
+            this.sendNotification(msg);
+          }
         case "incomingNotification":
+        case "incomingImage":
+        case "incomingColourChange":
           this.updateMessages(msg);
           break;
         case "dataUpdate":
           this.setState({ clients: msg.clientNumber })
-          break;
-        case "incomingImage":
-          this.updateMessages(msg);
-          break;
-        case "incomingColourChange":
-          this.updateMessages(msg);
           break;
         default:
           break;
       }
     }
     chattyServer.onclose = () => {
+      chattyServer.close();
       console.log("Server disconnected: attempting to reconnect")
       setTimeout(() => {
         console.log('Attempting to reconnect to server...');
@@ -82,9 +81,30 @@ class App extends Component {
     });
 
   }
-  componentWillUnmount() {
+
+  sendNotification(msg) {
+    const img = "https://logopond.com/logos/b3a58f13a7a17005e7bd8e8785b2d2b3.png";
+    const text = msg.username + ' posted a message';
+    if (!("Notification" in window)) {
+      alert("This browser does not support system notifications");
+    }
     
+    else if (Notification.permission === "granted") {
+      // If it's okay let's create a notification
+      const notification = new Notification('Chatty App', { body: text, icon: img });
+    }
+  
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        // If the user accepts, let's create a notification
+        if (permission === "granted") {
+          const notification = new Notification('Chatty App', { body: text, icon: img });
+        }
+      });
+    }
   }
+
   changeColour(col) {
     this.setState({ userColour: col })
   }

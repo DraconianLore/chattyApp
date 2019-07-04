@@ -23,6 +23,7 @@ class ChatBar extends Component {
         this.addEmoji = this.addEmoji.bind(this);
         this.emojiPicker = this.emojiPicker.bind(this);
         this.closeAll = this.closeAll.bind(this);
+        this.postImage = this.postImage.bind(this);
     }
     closeAll() {
         this.setState({
@@ -72,7 +73,7 @@ class ChatBar extends Component {
             })
         }
     }
-    postImage = (event) => {
+    postImage(event) {
         event.preventDefault();
         const newMessage = {
             type: "incomingImage",
@@ -122,15 +123,18 @@ class ChatBar extends Component {
                 imageUrlBar: false
             })
         }
-        console.log(emojiList)
     }
     addEmoji(event) {
         event.preventDefault();
-        let addedEmoji = this.state.message + ' ' + event.target.text;
-        this.setState({
+        let emoji = event.target.text;
+        this.setState((state, props) => {
+            let addedEmoji = state.message + ' ' + emoji;
+            return {
             message: addedEmoji,
             emojiList: false
+            }
         })
+        this.chatInput.focus();
     }
     checkKeypress(event) {
         if (event.key === 'Enter') {
@@ -162,7 +166,7 @@ class ChatBar extends Component {
             return <button key={col} type="button" style={{ backgroundColor: col }} className="colour-button" onClick={this.changeColour}></button>
         })
         const emojiBar = emojiJson.map((emo) => {
-            return <a href={emo} onClick={this.addEmoji}>{emo}</a>
+            return <a href={emo} key={emo} onClick={this.addEmoji}>{emo}</a>
         });
         const addImageInput = (
             <form onSubmit={this.postImage}>
@@ -177,7 +181,7 @@ class ChatBar extends Component {
                 {this.state.colourPalet && <div className="colour-palet">{rainbow}</div>}
                 <button type="button" style={{ backgroundColor: this.state.colour }} className="colour-button" onClick={this.colourPalet}></button>
                 <input className="chatbar-username" defaultValue={this.state.userName} onChange={this.changeUserName} onBlur={this.newUsername} onFocus={this.closeAll} />
-                <input className="chatbar-message" placeholder="Type a message and hit ENTER" value={this.state.message} onFocus={this.closeAll} onKeyPress={this.checkKeypress} onChange={this.changeMessage} />
+                <input className="chatbar-message" placeholder="Type a message and hit ENTER" ref={(el) => { this.chatInput = el; }} value={this.state.message} onFocus={this.closeAll} onKeyPress={this.checkKeypress} onChange={this.changeMessage} />
                 <button className="colour-button emoji-button" onClick={this.emojiPicker}>😀</button>
                 <button className="colour-button"><i className="far fa-image" onClick={this.addImage}></i></button>
                 {this.state.imageUrlBar && <div className="image-input">{addImageInput}</div>}
