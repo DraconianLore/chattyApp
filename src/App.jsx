@@ -3,98 +3,99 @@ import React, { Component } from 'react';
 import NavBar from './NavBar.jsx';
 import MessageList from './MessageList.jsx';
 import ChatBar from './ChatBar.jsx';
+let chattyServer;
+
+const animals = require('./animals.json');
+const colours = require('./colours.json');
+function randomizer(randomType) {
+  return (randomType[Math.floor(Math.random() * randomType.length)]);
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentUser: 'Anonymous',
-      messages: [
-        {
-          id: 1,
-          type: "incomingMessage",
-          content: "I won't be impressed with technology until I can download food.",
-          username: "Anonymous1"
-        },
-        {
-          id: 2,
-          type: "incomingNotification",
-          content: "Anonymous1 changed their name to nomnom",
-        },
-        {
-          id: 3,
-          type: "incomingMessage",
-          content: "I wouldn't want to download Kraft Dinner. I'd be scared of cheese packet loss.",
-          username: "Anonymous2"
-        },
-        {
-          id: 4,
-          type: "incomingMessage",
-          content: "...",
-          username: "nomnom"
-        },
-        {
-          id: 5,
-          type: "incomingMessage",
-          content: "I'd love to download a fried egg, but I'm afraid encryption would scramble it",
-          username: "Anonymous2"
-        },
-        {
-          id: 6,
-          type: "incomingMessage",
-          content: "This isn't funny. You're not funny",
-          username: "nomnom"
-        },
-        {
-          id: 7,
-          type: "incomingNotification",
-          content: "Anonymous2 changed their name to NotFunny",
-        },
-      ]
-
+      currentUser: 'Anonymous ' + randomizer(animals),
+      userColour: randomizer(colours),
+      messages: [],
+      clients: 0
     }
     this.postNewMessage = this.postNewMessage.bind(this);
-    this.getNextID = this.getNextID.bind(this);
+    this.updateMessages = this.updateMessages.bind(this);
+    this.changeColour = this.changeColour.bind(this);
   }
-  componentDidMount() {
-    console.log("componentDidMount <App />");
-    setTimeout(() => {
-      console.log("Simulating incoming message");
-      // Add a new message to the list of messages in the data store
-      const newMessage = { id: 999999913, username: "Nima", content: "I'm in love with Kanye 😍", type: "incomingMessage" };
-      const messages = this.state.messages.concat(newMessage)
-      // Update the state of the app component.
-      // Calling setState will trigger a call to render() in App and all child components.
-      this.setState({ messages: messages })
-    }, 6000);
-    // connect to Chatty App Server
-    const chattyServerConnection = new WebSocket('ws://localhost:3001');
-    this.setState({ chattyServer: chattyServerConnection })
-    chattyServerConnection.onopen = (event) => {
+  connectToServer() {
+    chattyServer = new WebSocket('ws://192.168.88.215:3001/');
+    chattyServer.onopen = (event) => {
       console.log('connected to server');
     }
-  }
-  getNextID() {
-    return (this.state.messages.length + 1)
-  }
-  postNewMessage(message) {
-    //send message to server
-    if (message.username) {
-      this.state.chattyServer.send(message.username + ' said ' + message.content);
-    } else {
-      this.state.chattyServer.send(message.content);
+    chattyServer.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      switch (msg.type) {
+        case "incomingMessage":
+          this.updateMessages(msg);
+          break;
+        case "incomingNotification":
+          this.updateMessages(msg);
+          break;
+        case "dataUpdate":
+          this.setState({ clients: msg.clientNumber })
+          break;
+        case "incomingImage":
+          this.updateMessages(msg);
+        break;
+        default:
+          break;
+      }
     }
-    // update state message
+    chattyServer.onclose = () => {
+      console.log("Server disconnected: attempting to reconnect")
+      setTimeout(() => {
+        console.log('Attempting to reconnect to server...');
+        this.connectToServer();
+      }, 5000);
+    }
+
+  }
+
+
+  componentDidMount() {
+    // connect to Chatty App Server
+    this.connectToServer();
+      setTimeout(() => {
+        const newMessage = {
+          type: "incomingNotification",
+          content: `${this.state.currentUser} joined the chat!`,
+        }
+        this.postNewMessage(newMessage)
+      }, 1000); 
+    
+
+
+  }
+
+  changeColour(col) {
+    this.setState({ userColour: col })
+  }
+
+  updateMessages(message) {
     const addMessage = this.state.messages.concat(message);
     this.setState({ messages: addMessage })
   }
+  postNewMessage(message) {
+    //send message to server
+    message.colour = this.state.userColour;
+    const messageJson = JSON.stringify(message);
+    chattyServer.send(messageJson);
+  }
+
 
   render() {
     return (
       <div>
-        <NavBar />
+        <NavBar clients={this.state.clients} />
         <MessageList posts={this.state.messages} />
-        <ChatBar username={this.state.currentUser} postMessage={this.postNewMessage} nextID={this.getNextID} />
+        <ChatBar username={this.state.currentUser} postMessage={this.postNewMessage} colour={this.state.userColour} palet={colours} changeColour={this.changeColour} />
       </div>
     );
   }
