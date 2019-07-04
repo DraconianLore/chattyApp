@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+const emojiJson = require ('./emojis.json');
 
 class ChatBar extends Component {
     constructor(props) {
@@ -9,7 +10,8 @@ class ChatBar extends Component {
             newUserName: props.username,
             colour: props.colour,
             colourPalet: false,
-            imageUrlBar: false
+            imageUrlBar: false,
+            emojiList: false
         }
         this.changeUserName = this.changeUserName.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
@@ -18,13 +20,28 @@ class ChatBar extends Component {
         this.colourPalet = this.colourPalet.bind(this);
         this.changeColour = this.changeColour.bind(this);
         this.addImage = this.addImage.bind(this);
+        this.addEmoji = this.addEmoji.bind(this);
+        this.emojiPicker = this.emojiPicker.bind(this);
+        this.closeAll = this.closeAll.bind(this);
+    }
+    closeAll() {
+        this.setState({
+            colourPalet: false,
+            imageUrlBar: false,
+            emojiList: false
+        })
     }
     colourPalet(event) {
         event.preventDefault();
         if (this.state.colourPalet) {
-            this.setState({ colourPalet: false })
+            this.closeAll();
         } else {
-            this.setState({ colourPalet: true })
+            this.setState({ 
+                colourPalet: true,
+                imageUrlBar: false,
+                emojiList: false
+            
+            })
         }
     }
     changeColour(event) {
@@ -36,17 +53,23 @@ class ChatBar extends Component {
             colourPalet: false
         })
         const newMessage = {
-            type: "incomingNotification",
-            content: `${this.state.userName} changed their colour!`,
+            type: "incomingColourChange",
+            content: ` changed their colour!`,
+            newColour: col,
+            username: this.state.userName
         }
         this.props.postMessage(newMessage)
     }
     addImage(event) {
         event.preventDefault();
         if (this.state.imageUrlBar) {
-            this.setState({ imageUrlBar: false })
+            this.closeAll();
         } else {
-            this.setState({ imageUrlBar: true })
+            this.setState({ 
+                imageUrlBar: true,
+                colourPalet: false,
+                emojiList: false
+            })
         }
     }
     postImage = (event) => {
@@ -71,7 +94,7 @@ class ChatBar extends Component {
         }
         const newMessage = {
             type: "incomingNotification",
-            content: `${this.state.userName} changed their name to ${newName}`,
+            content: `👀 ${this.state.userName} changed their name to ${newName}`,
         }
         this.setState({
             userName: event.target.value
@@ -89,15 +112,43 @@ class ChatBar extends Component {
             newUserName: event.target.value
         })
     }
+    emojiPicker(event) {
+        if(this.state.emojiList) {
+            this.closeAll();
+        } else {
+            this.setState({
+                emojiList: true,
+                colourPalet: false,
+                imageUrlBar: false
+            })
+        }
+        console.log(emojiList)
+    }
+    addEmoji(event) {
+        event.preventDefault();
+        let addedEmoji = this.state.message + ' ' + event.target.text;
+        this.setState({
+            message: addedEmoji,
+            emojiList: false
+        })
+    }
     checkKeypress(event) {
         if (event.key === 'Enter') {
+            let newMessage;
             if (this.state.message.length < 1) {
                 return;
             }
-            const newMessage = {
-                "type": "incomingMessage",
-                "content": this.state.message,
-                "username": this.state.userName
+            if(this.state.message.slice(0,3) === '/me') {
+                newMessage = {
+                    "type": "incomingNotification",
+                    "content": this.state.userName + ' ' + this.state.message.slice(4)
+                }
+            } else {
+                newMessage = {
+                    "type": "incomingMessage",
+                    "content": this.state.message,
+                    "username": this.state.userName
+                }
             }
             this.setState({
                 message: ''
@@ -105,10 +156,14 @@ class ChatBar extends Component {
             this.props.postMessage(newMessage)
         }
     }
+    
     render() {
         const rainbow = this.props.palet.map((col) => {
             return <button key={col} type="button" style={{ backgroundColor: col }} className="colour-button" onClick={this.changeColour}></button>
         })
+        const emojiBar = emojiJson.map((emo) => {
+            return <a href={emo} onClick={this.addEmoji}>{emo}</a>
+        });
         const addImageInput = (
             <form onSubmit={this.postImage}>
                 <h1>Send a Meme</h1>
@@ -116,14 +171,18 @@ class ChatBar extends Component {
                 <button type="submit" className="btn-new-image">POST</button>    
             </form>
         )
+       
         return (
             <footer className="chatbar">
                 {this.state.colourPalet && <div className="colour-palet">{rainbow}</div>}
                 <button type="button" style={{ backgroundColor: this.state.colour }} className="colour-button" onClick={this.colourPalet}></button>
-                <input className="chatbar-username" defaultValue={this.state.userName} onChange={this.changeUserName} onBlur={this.newUsername} />
-                <input className="chatbar-message" placeholder="Type a message and hit ENTER" value={this.state.message} onKeyPress={this.checkKeypress} onChange={this.changeMessage} />
+                <input className="chatbar-username" defaultValue={this.state.userName} onChange={this.changeUserName} onBlur={this.newUsername} onFocus={this.closeAll} />
+                <input className="chatbar-message" placeholder="Type a message and hit ENTER" value={this.state.message} onFocus={this.closeAll} onKeyPress={this.checkKeypress} onChange={this.changeMessage} />
+                <button className="colour-button emoji-button" onClick={this.emojiPicker}>😀</button>
                 <button className="colour-button"><i className="far fa-image" onClick={this.addImage}></i></button>
                 {this.state.imageUrlBar && <div className="image-input">{addImageInput}</div>}
+                {this.state.emojiList && <div className="emoji-bar">{emojiBar}</div>}
+                
             </footer>
         );
 

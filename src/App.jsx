@@ -43,7 +43,10 @@ class App extends Component {
           break;
         case "incomingImage":
           this.updateMessages(msg);
-        break;
+          break;
+        case "incomingColourChange":
+          this.updateMessages(msg);
+          break;
         default:
           break;
       }
@@ -62,18 +65,26 @@ class App extends Component {
   componentDidMount() {
     // connect to Chatty App Server
     this.connectToServer();
-      setTimeout(() => {
-        const newMessage = {
-          type: "incomingNotification",
-          content: `${this.state.currentUser} joined the chat!`,
-        }
-        this.postNewMessage(newMessage)
-      }, 1000); 
-    
+    setTimeout(() => {
+      const newMessage = {
+        type: "incomingNotification",
+        content: `🔵 ${this.state.currentUser} joined the chat!`,
+      }
+      this.postNewMessage(newMessage)
+    }, 1000);
 
+    window.addEventListener("beforeunload", () => {
+      const newMessage = {
+        type: "incomingNotification",
+        content: `➖ ${this.state.currentUser} left the chat!`,
+      }
+      this.postNewMessage(newMessage);
+    });
 
   }
-
+  componentWillUnmount() {
+    
+  }
   changeColour(col) {
     this.setState({ userColour: col })
   }

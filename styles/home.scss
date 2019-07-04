@@ -35,6 +35,9 @@ body {
   margin: 5px;
   padding: 0 9px;
 }
+.emoji-button {
+  padding: 0;
+}
 
 .chatbar-message {
   flex: 8;
@@ -53,6 +56,8 @@ body {
   font-size: 1.6em;
   background-color: lightblue;
   border-color: lightblue;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 .colour-palet {
   padding-left: 5px;
@@ -89,6 +94,22 @@ body {
   width: 66%;
   padding: 5px;
 }
+.emoji-bar {
+  display: flex;
+  flex-wrap: wrap;
+  padding-right: 5px;
+  background-color: rebeccapurple;
+  position: absolute;
+  bottom: 65px;
+  left: 20vw;
+  z-index: 2;
+  font-size: 1.5em;
+  padding: 5px;
+  border-radius: 20px;
+}
+.emoji-bar a {
+  padding: 5px;
+}
 .btn-new-image {
   margin-top: 10px;
   width: 50px;
@@ -97,10 +118,7 @@ body {
   background-color: darkorange;
   border-color: coral;
 }
-.posted-image {
-  max-Width: 60%;
-  max-Height: 40%;
-}
+
 
 .message {
   display: flex;
@@ -108,14 +126,33 @@ body {
   border-bottom: 2px solid;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  justify-content: center;
+  border-color: black;
 }
 
 .message.system {
   font-style: italic;
   padding: 5px 20px;
   background-color: khaki;
-  border-bottom: 0;
+  border: 2px solid;
   border-radius: 20px;
+  width: 300px;
+  margin: auto;
+}
+.message.meme {
+  display: flex;
+  flex-direction: column;
+  font-style: italic;
+  padding: 5px 20px;
+  background-color: khaki;
+  border-radius: 20px;
+  align-items: flex-start;
+  margin-left: 1em;
+  margin-right: 1em;
+  border: 2px solid;
+}
+.posted-image {
+  max-Width: 60%;
 }
 
 .message-content,
@@ -149,6 +186,7 @@ body {
 .client-count {
   float: right;
   margin-top: 1.5em;
+  margin-right: 3em;
 }
 
 .navbar-brand {
