@@ -1,5 +1,7 @@
 # ChattyApp
-=====================
+
+------------
+
 A compact anonymous chatroom built with nodeJS, React, WebSockets and sass .
 
 ### Setup
@@ -27,7 +29,7 @@ Users can
  - Type `/me does something` to send a notification of `[username] does something`
  - Add emoji to their messages
  - See how many users are connected, and get notifications when people join or leave
-
+ - Get browser notifications when someone sends a message
 
  ### Screenshot
 
