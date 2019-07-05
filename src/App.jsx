@@ -75,7 +75,6 @@ class App extends Component {
 
     if (Notification.permission !== "granted") {
       Notification.requestPermission(function (permission) {
-        console.log('permission granted')
       })
       }
 

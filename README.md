@@ -1,45 +1,35 @@
-React Boilerplate
+# ChattyApp
 =====================
+A compact anonymous chatroom built with nodeJS, React, WebSockets and sass .
 
-A minimal and light dev environment for ReactJS.
-
-### Usage
-
-Clone the boilerplate and create your own git repo.
-
+### Setup
+Install the serverside dependancies and start the server.
 ```
-git clone git@github.com:lighthouse-labs/react-simple-boilerplate.git
-cd react-simple-boilerplate
-git remote rm origin
-git remote add origin [YOUR NEW REPOSITORY]
-# Manually update your package.json file
+cd chatty_server
+npm install
+npm start
 ```
 
-Install the dependencies and start the server.
 
+Install the clientside dependencies and start the server.
 ```
 npm install
 npm start
 open http://localhost:3000
 ```
 
-### Static Files
+### Features
+Upon entering the chatroom each user is assigned a random name based on an animal ie: Anonymous Crocodile.
+Users can 
+ - Change their name
+ - Change the colour of their name and messages
+ - Post an image/meme from a URL
+ - Type `/me does something` to send a notification of `[username] does something`
+ - Add emoji to their messages
+ - See how many users are connected, and get notifications when people join or leave
 
-You can store static files like images, fonts, etc in the `build` folder.
 
-For example, if you copy a file called my_image.png into the build folder you can access it using `http://localhost:3000/build/my_image.png`.
+ ### Screenshot
 
-### Linting
 
-This boilerplate project includes React ESLint configuration.
-
-```
-npm run lint
-```
-
-### Dependencies
-
-* React
-* Webpack
-* [babel-loader](https://github.com/babel/babel-loader)
-* [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
+![Screenshot](../screenshot.png)
