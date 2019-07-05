@@ -30,6 +30,7 @@ Users can
  - Add emoji to their messages
  - See how many users are connected, and get notifications when people join or leave
  - Get browser notifications when someone sends a message
+ - Share a URL link
 
  ### Screenshot
 
