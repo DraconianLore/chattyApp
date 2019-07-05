@@ -94,6 +94,15 @@ body {
   width: 66%;
   padding: 5px;
 }
+.invalid-url-error {
+  background-color: red;
+  color: gold;
+  margin: 5px 0 0 0;
+  padding: 10px;
+  border-radius: 50px;
+  width: 50%;
+
+}
 .emoji-bar {
   display: flex;
   flex-wrap: wrap;

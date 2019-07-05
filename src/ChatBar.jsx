@@ -11,7 +11,8 @@ class ChatBar extends Component {
             colour: props.colour,
             colourPalet: false,
             imageUrlBar: false,
-            emojiList: false
+            emojiList: false,
+            invalidUrl: false
         }
         this.changeUserName = this.changeUserName.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
@@ -69,20 +70,28 @@ class ChatBar extends Component {
             this.setState({ 
                 imageUrlBar: true,
                 colourPalet: false,
-                emojiList: false
+                emojiList: false,
+                invalidUrl: false
             })
         }
     }
     postImage(event) {
         event.preventDefault();
-        const newMessage = {
-            type: "incomingImage",
-            content: event.target.imageURL.value,
-            username: this.state.userName
+        const validateURL = new RegExp('(https:?//)?(www.)?.+.(png|jpe?g|gif)');
+        if (validateURL.test(event.target.imageURL.value) && (event.target.imageURL.value.length > 5)) {
+            const newMessage = {
+                type: "incomingImage",
+                content: event.target.imageURL.value,
+                username: this.state.userName
+            }
+            this.props.postMessage(newMessage)
+            this.setState({imageUrlBar: false})
+        } else {
+            this.setState({invalidUrl: true})
         }
-        this.props.postMessage(newMessage)
-        this.setState({imageUrlBar: false})
+
     }
+
     newUsername(event) {
         let newName = event.target.value;
         if (newName === '') {
@@ -172,6 +181,7 @@ class ChatBar extends Component {
             <form onSubmit={this.postImage}>
                 <h1>Send a Meme</h1>
                 <input type="text" name="imageURL" placeholder="Enter image URL"></input>
+                {this.state.invalidUrl && <h2 className="invalid-url-error">INVALID URL</h2>}
                 <button type="submit" className="btn-new-image">POST</button>    
             </form>
         )
