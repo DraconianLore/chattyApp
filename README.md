@@ -32,4 +32,4 @@ Users can
  ### Screenshot
 
 
-![Screenshot](../screenshot.png)
+![Screenshot](./screenshot.png)
