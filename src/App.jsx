@@ -27,7 +27,7 @@ class App extends Component {
     this.changeColour = this.changeColour.bind(this);
   }
   connectToServer() {
-    chattyServer = new WebSocket('ws://192.168.88.104:3001/');
+    chattyServer = new WebSocket('ws://localhost:3001/');
     chattyServer.onopen = (event) => {
       console.log('connected to server');
     }
