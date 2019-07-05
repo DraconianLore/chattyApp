@@ -41,6 +41,7 @@ class App extends Component {
         case "incomingNotification":
         case "incomingImage":
         case "incomingColourChange":
+        case "incomingLink":
           this.updateMessages(msg);
           break;
         case "dataUpdate":

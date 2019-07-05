@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-const emojiJson = require ('./emojis.json');
+const emojiJson = require('./emojis.json');
 
 class ChatBar extends Component {
     constructor(props) {
@@ -38,11 +38,11 @@ class ChatBar extends Component {
         if (this.state.colourPalet) {
             this.closeAll();
         } else {
-            this.setState({ 
+            this.setState({
                 colourPalet: true,
                 imageUrlBar: false,
                 emojiList: false
-            
+
             })
         }
     }
@@ -67,7 +67,7 @@ class ChatBar extends Component {
         if (this.state.imageUrlBar) {
             this.closeAll();
         } else {
-            this.setState({ 
+            this.setState({
                 imageUrlBar: true,
                 colourPalet: false,
                 emojiList: false,
@@ -85,9 +85,9 @@ class ChatBar extends Component {
                 username: this.state.userName
             }
             this.props.postMessage(newMessage)
-            this.setState({imageUrlBar: false})
+            this.setState({ imageUrlBar: false })
         } else {
-            this.setState({invalidUrl: true})
+            this.setState({ invalidUrl: true })
         }
 
     }
@@ -123,7 +123,7 @@ class ChatBar extends Component {
         })
     }
     emojiPicker(event) {
-        if(this.state.emojiList) {
+        if (this.state.emojiList) {
             this.closeAll();
         } else {
             this.setState({
@@ -139,8 +139,8 @@ class ChatBar extends Component {
         this.setState((state, props) => {
             let addedEmoji = state.message + ' ' + emoji;
             return {
-            message: addedEmoji,
-            emojiList: false
+                message: addedEmoji,
+                emojiList: false
             }
         })
         this.chatInput.focus();
@@ -151,7 +151,14 @@ class ChatBar extends Component {
             if (this.state.message.length < 1) {
                 return;
             }
-            if(this.state.message.slice(0,3) === '/me') {
+            if (this.state.message.slice(0, 4) == 'http') {
+                console.log('wtf')
+                newMessage = {
+                    "type": "incomingLink",
+                    "content": this.state.message,
+                    "username": this.state.userName
+                }
+            } else if (this.state.message.slice(0, 3) === '/me') {
                 newMessage = {
                     "type": "incomingNotification",
                     "content": this.state.userName + ' ' + this.state.message.slice(4)
@@ -169,7 +176,7 @@ class ChatBar extends Component {
             this.props.postMessage(newMessage)
         }
     }
-    
+
     render() {
         const rainbow = this.props.palet.map((col) => {
             return <button key={col} type="button" style={{ backgroundColor: col }} className="colour-button" onClick={this.changeColour}></button>
@@ -182,10 +189,10 @@ class ChatBar extends Component {
                 <h1>Send a Meme</h1>
                 <input type="text" name="imageURL" placeholder="Enter image URL"></input>
                 {this.state.invalidUrl && <h2 className="invalid-url-error">INVALID URL</h2>}
-                <button type="submit" className="btn-new-image">POST</button>    
+                <button type="submit" className="btn-new-image">POST</button>
             </form>
         )
-       
+
         return (
             <footer className="chatbar">
                 {this.state.colourPalet && <div className="colour-palet">{rainbow}</div>}
@@ -196,7 +203,7 @@ class ChatBar extends Component {
                 <button className="colour-button"><i className="far fa-image" onClick={this.addImage}></i></button>
                 {this.state.imageUrlBar && <div className="image-input">{addImageInput}</div>}
                 {this.state.emojiList && <div className="emoji-bar">{emojiBar}</div>}
-                
+
             </footer>
         );
 
