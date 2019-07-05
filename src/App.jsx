@@ -11,6 +11,7 @@ function randomizer(randomType) {
 }
 let chattyServer;
 
+// set up notificatioins
 
 class App extends Component {
   constructor(props) {
@@ -34,7 +35,7 @@ class App extends Component {
       const msg = JSON.parse(event.data);
       switch (msg.type) {
         case "incomingMessage":
-          if (msg.username !== this.state.currentUser){
+          if (msg.username !== this.state.currentUser) {
             this.sendNotification(msg);
           }
         case "incomingNotification":
@@ -72,6 +73,12 @@ class App extends Component {
       this.postNewMessage(newMessage)
     }, 1000);
 
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission(function (permission) {
+        console.log('permission granted')
+      })
+      }
+
     window.addEventListener("beforeunload", () => {
       const newMessage = {
         type: "incomingNotification",
@@ -85,25 +92,12 @@ class App extends Component {
   sendNotification(msg) {
     const img = "https://logopond.com/logos/b3a58f13a7a17005e7bd8e8785b2d2b3.png";
     const text = msg.username + ' posted a message';
-    if (!("Notification" in window)) {
-      alert("This browser does not support system notifications");
-    }
-    
-    else if (Notification.permission === "granted") {
-      // If it's okay let's create a notification
+    if (Notification.permission === "granted") {
       const notification = new Notification('Chatty App', { body: text, icon: img });
     }
-  
-    // Otherwise, we need to ask the user for permission
-    else if (Notification.permission !== 'denied') {
-      Notification.requestPermission(function (permission) {
-        // If the user accepts, let's create a notification
-        if (permission === "granted") {
-          const notification = new Notification('Chatty App', { body: text, icon: img });
-        }
-      });
-    }
+
   }
+
 
   changeColour(col) {
     this.setState({ userColour: col })
@@ -127,7 +121,7 @@ class App extends Component {
         <NavBar clients={this.state.clients} />
         <MessageList posts={this.state.messages} />
         <ChatBar username={this.state.currentUser} postMessage={this.postNewMessage} colour={this.state.userColour} palet={colours} changeColour={this.changeColour} />
-      </div>
+      </div >
     );
   }
 }
